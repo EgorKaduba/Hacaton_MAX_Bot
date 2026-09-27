@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import computed_field
+from pydantic import computed_field, EmailStr
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     )
     PROJECT_NAME: str
     PROJECT_VERSION: str = "1.0.0"
+    ADMIN_NAME: str
+    ADMIN_EMAIL: EmailStr
 
     DEBUG: bool = True
 
