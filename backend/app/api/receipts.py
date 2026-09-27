@@ -4,10 +4,12 @@ import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 
 from ..deps import SessionDep
-from ..models import Receipt
+from ..models import Receipt, CheckResult
 from ..schemas.receipt import ReceiptUploadResponse, ReceiptsListItem, ReceiptDetailResponse
+from ..schemas.check_result import ErrorsResponse
 from ..tools.receipt_service import save_parsed_receipt
 from ..tools.parse_epd import parse
+from ..tools.errors_check import check_receipt
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -26,11 +28,10 @@ UPLOAD_DIR.mkdir(exist_ok=True)
     summary="Загрузка файла квитанции"
 )
 async def upload_receipt(
-    max_user_id: int,
-    session: SessionDep,
-    file: UploadFile = File(...)
+        max_user_id: int,
+        session: SessionDep,
+        file: UploadFile = File(...)
 ):
-
     file_name = f"{uuid.uuid4()}.pdf"
     file_path = UPLOAD_DIR / file_name
     with open(file_path, "wb") as f:
@@ -50,12 +51,13 @@ async def upload_receipt(
 
     receipt = await save_parsed_receipt(
         session=session,
-        user_id=user.id, # type: ignore[arg-type]
+        user_id=user.id,  # type: ignore[arg-type]
         file_path=str(file_path),
         parsed_data=parsed["result"],
     )
 
     return receipt
+
 
 @router.get(
     "/user/{max_user_id}",
@@ -74,6 +76,7 @@ async def get_receipt(
         select(Receipt).where(Receipt.user_id == user.id).order_by(Receipt.created_at.desc())
     )
     return receipts.all()
+
 
 @router.get(
     "/{receipt_id}",
@@ -97,3 +100,36 @@ async def get_receipt(
     if not receipt:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receipt not found")
     return receipt
+
+
+@router.post(
+    "/check/{receipt_id}",
+    response_model=ErrorsResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Проверка квитанции на ошибки"
+)
+async def check_receipt_endpoint(
+        receipt_id: int,
+        session: SessionDep
+):
+    receipt = await session.scalar(
+        select(Receipt).where(Receipt.id == receipt_id).
+        options(selectinload(Receipt.service_charges))
+    )
+
+    if not receipt:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receipt not found")
+
+    check_result = await session.scalar(select(CheckResult).where(CheckResult.receipt_id == receipt_id))
+
+    if check_result:
+        return check_result
+
+    result = check_receipt(receipt)
+
+    session.add(result)
+
+    receipt.status = "checked"
+    await session.flush()
+
+    return result
