@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
+    
+    LLM_ENABLED: bool = False
+    LLM_BASE_URL: str = "https://text.pollinations.ai/openai"
+    LLM_API_KEY: str = "not-needed"
+    LLM_MODEL: str = "openai"
 
     @computed_field  # type: ignore[prop-decorator]
     @property
