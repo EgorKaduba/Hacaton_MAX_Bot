@@ -1,7 +1,7 @@
 from pathlib import Path
 import uuid
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Response
 
 from ..deps import SessionDep
 from ..models import Receipt, CheckResult
@@ -10,10 +10,19 @@ from ..schemas.check_result import ErrorsResponse
 from ..tools.receipt_service import save_parsed_receipt
 from ..tools.parse_epd import parse
 from ..tools.errors_check import check_receipt
+from ..tools.complaint_generator import generate_complaint_pdf
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from ..models.user import User
+
+
+MONTHS_ENG = {
+    "январь": "january", "февраль": "february", "март": "march",
+    "апрель": "april", "май": "may", "июнь": "june",
+    "июль": "july", "август": "august", "сентябрь": "september",
+    "октябрь": "october", "ноябрь": "november", "декабрь": "december",
+}
 
 router = APIRouter(prefix="/receipts", tags=["receipts"])
 
@@ -114,7 +123,12 @@ async def check_receipt_endpoint(
 ):
     receipt = await session.scalar(
         select(Receipt).where(Receipt.id == receipt_id).
-        options(selectinload(Receipt.service_charges))
+        options(
+            selectinload(Receipt.service_charges),
+            selectinload(Receipt.meter_infos),
+            selectinload(Receipt.coefficients),
+            selectinload(Receipt.recalculations)
+        )
     )
 
     if not receipt:
@@ -133,3 +147,45 @@ async def check_receipt_endpoint(
     await session.flush()
 
     return result
+
+@router.get(
+    "/{receipt_id}/complaint",
+    summary="генерация жалобы на квитанцию",
+)
+async def get_complaint(
+    receipt_id: int,
+    session: SessionDep,
+):
+    receipt = await session.scalar(
+        select(Receipt).where(Receipt.id == receipt_id)
+        .options(
+            selectinload(Receipt.service_charges),
+            selectinload(Receipt.coefficients),
+            selectinload(Receipt.recalculations),
+        )
+    )
+    if not receipt:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Receipt not found")
+
+    check_result = await session.scalar(
+        select(CheckResult).where(CheckResult.receipt_id == receipt_id)
+    )
+    if not check_result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Receipt not checked yet")
+
+    if not check_result.has_errors:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="No errors found")
+
+    pdf_bytes = generate_complaint_pdf(receipt, check_result)
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition":
+                f'attachment; filename="complaint_{MONTHS_ENG.get(receipt.period_month)}_{receipt.period_year}.pdf"'
+        },
+    )
