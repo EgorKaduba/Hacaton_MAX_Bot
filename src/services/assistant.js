@@ -1,3 +1,5 @@
+import { sendChatMessage } from "../api/ai";
+import { USE_MOCK } from "../api/client";
 import { getReceipt, getReceiptCheck, getReceipts } from "../api/receipts";
 import { num, rub, signedRub } from "../utils/format";
 import {
@@ -99,8 +101,8 @@ const answerService = ({ latest }, question) => {
   };
 };
 
-/** Заглушка ответа AI: собирает ответ из данных квитанций. Заменить на запрос к бэкенду. */
-export const askAssistant = async (question) => {
+/** Ответ в мок-режиме: собирается из данных квитанций без бэкенда */
+const askMock = async (question) => {
   const [ctx] = await Promise.all([
     loadContext(),
     new Promise((r) => setTimeout(r, 700)),
@@ -116,6 +118,9 @@ export const askAssistant = async (question) => {
     };
   return answerService(ctx, question) ?? answerChanges(ctx);
 };
+
+export const askAssistant = async (question) =>
+  USE_MOCK ? askMock(question) : { text: await sendChatMessage(question) };
 
 export const SUGGESTIONS = [
   "Почему изменилась сумма?",

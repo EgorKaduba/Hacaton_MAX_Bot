@@ -17,6 +17,11 @@ export const AddReceipt = () => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    if (file.type !== "application/pdf" && !/\.pdf$/i.test(file.name)) {
+      bridge.haptic.notify("error");
+      setError("Нужен PDF-файл квитанции");
+      return;
+    }
     if (file.size > MAX_SIZE) {
       bridge.haptic.notify("error");
       setError("Файл больше 10 МБ — выберите файл поменьше");
@@ -48,8 +53,8 @@ export const AddReceipt = () => {
         </IconBubble>
         <span className="upload-option__title">Загрузить файл</span>
         <span className="upload-option__text">
-          PDF, JPG, PNG · до 10 МБ. Мы распознаем начисления и проверим их на
-          ошибки
+          PDF-файл квитанции (ЕПД) до 10 МБ. Мы распознаем начисления и
+          проверим их на ошибки
         </span>
         <span className="upload-option__link">
           Выбрать <IconChevronRight size={14} />
@@ -61,7 +66,7 @@ export const AddReceipt = () => {
       <input
         ref={fileRef}
         type="file"
-        accept="application/pdf,image/jpeg,image/png"
+        accept="application/pdf,.pdf"
         hidden
         onChange={onPick}
       />

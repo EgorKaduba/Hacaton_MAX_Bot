@@ -97,7 +97,7 @@ const PeriodStructure = ({ period }) => {
   const share = (v) => (total > 0 ? Math.round((v / total) * 100) : 0);
 
   return (
-    <>
+    <div className="analytics-grid">
       <Card>
         <SectionHeader title="Структура расходов" />
         <div className="donut-wrap">
@@ -140,7 +140,7 @@ const PeriodStructure = ({ period }) => {
           </div>
         </div>
       </Card>
-    </>
+    </div>
   );
 };
 

@@ -21,7 +21,7 @@ import { createComplaint, getReceipt } from "../api/receipts";
 import { useApi } from "../hooks/useApi";
 import { copyText } from "../utils/clipboard";
 import { periodLabel } from "../utils/receipt";
-import { bridge } from "../bridge/max";
+import { bridge, isInsideMax } from "../bridge/max";
 
 export const Complaint = () => {
   const { id } = useParams();
@@ -33,6 +33,7 @@ export const Complaint = () => {
   const period = periodLabel(receiptReq.data);
   const text = complaintReq.data?.text;
   const pdfUrl = complaintReq.data?.pdf_url;
+  const blobUrl = complaintReq.data?.blob_url;
   const fileName = `Жалоба ${period || `квитанция ${id}`}.pdf`;
 
   const copy = async () => {
@@ -44,13 +45,15 @@ export const Complaint = () => {
 
   const share = () => {
     bridge.haptic.impact("light");
-    bridge.share(text ?? "", pdfUrl).catch(() => {});
+    bridge
+      .share(text ?? `Жалоба по квитанции ЖКУ за ${period.toLowerCase()}`, pdfUrl)
+      .catch(() => {});
   };
 
   const download = async () => {
     setDownloadError(null);
     try {
-      await bridge.downloadFile(pdfUrl, fileName);
+      await bridge.downloadFile(isInsideMax() ? pdfUrl : (blobUrl ?? pdfUrl), fileName);
       bridge.haptic.notify("success");
     } catch (e) {
       bridge.haptic.notify("error");
@@ -114,8 +117,11 @@ export const Complaint = () => {
             <IconBubble size={56}>
               <IconFile size={28} />
             </IconBubble>
-            <b>Жалоба готова</b>
-            <span className="muted small">{fileName}</span>
+            <b>Претензия готова</b>
+            <span className="muted small">
+              PDF с таблицей нарушений и требованием перерасчёта. Впишите свои
+              данные и отправьте в управляющую компанию.
+            </span>
           </Card>
           <BottomBar>
             <Button

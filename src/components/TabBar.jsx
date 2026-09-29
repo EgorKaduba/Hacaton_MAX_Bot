@@ -27,7 +27,11 @@ const TABS = [
 export const TabBar = () => {
   const { pathname } = useLocation();
   return (
-    <nav className="tab-bar">
+    <nav className="tab-bar" aria-label="Основное меню">
+      <div className="tab-bar__brand">
+        <span className="tab-bar__logo">ДК</span>
+        <span className="tab-bar__name">ДомКвит</span>
+      </div>
       {TABS.map(({ to, label, icon: Icon, match }) => {
         const active = match.some((m) => pathname.startsWith(m));
         return (

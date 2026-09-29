@@ -34,8 +34,11 @@ export const monthIndex = (name) =>
   MONTHS.indexOf(String(name ?? "").trim().toLowerCase());
 
 /** «Июль 2026» */
-export const periodLabel = (r) =>
-  r ? `${capitalize(String(r.period_month ?? ""))} ${r.period_year ?? ""}`.trim() : "";
+export const periodLabel = (r) => {
+  if (!r) return "";
+  if (!r.period_month && !r.period_year) return `Квитанция №${r.id}`;
+  return `${capitalize(String(r.period_month ?? ""))} ${r.period_year ?? ""}`.trim();
+};
 
 /** «к июлю» */
 export const monthDative = (r) =>
@@ -56,6 +59,7 @@ export const receiptTotal = (r) =>
 
 const STATUSES = {
   parsed: { label: "Распознана", tone: "success" },
+  checked: { label: "Проверена", tone: "success" },
   uploaded: { label: "Обрабатывается", tone: "info" },
   processing: { label: "Обрабатывается", tone: "info" },
   pending: { label: "Обрабатывается", tone: "info" },
@@ -139,20 +143,31 @@ const SEVERITY_TONES = {
 export const severityTone = (severity) =>
   SEVERITY_TONES[String(severity ?? "").toLowerCase()] ?? "warning";
 
+/** Типы ошибок из backend/app/tools/errors_check.py */
 const ERROR_TYPES = {
-  coefficient: "Повышающий коэффициент",
-  calculation: "Ошибка в расчёте",
-  tariff: "Неверный тариф",
-  recalculation: "Перерасчёт",
-  duplicate: "Двойное начисление",
+  arithmetic: "Ошибка в итоговой сумме",
+  totals_mismatch: "Ошибка в итоге со страхованием",
+  duplicate_service: "Двойное начисление",
+  duplicate_across_sections: "Услуга в разных разделах",
+  tariff_mismatch: "Не совпадает с тарифом",
+  row_total_mismatch: "Ошибка в итоге по услуге",
+  overpayment: "Переплата",
+  recalculation_without_record: "Перерасчёт без записи",
+  recalculation_without_reason: "Перерасчёт без основания",
+  recalculation_amount_mismatch: "Расхождение в перерасчёте",
+  coefficient_mismatch: "Ошибка в повышающем коэффициенте",
+  coefficient_without_excess: "Коэффициент без расчёта",
 };
 
 export const errorTypeLabel = (type) => ERROR_TYPES[type] ?? "Ошибка";
 
-/** Сумма, начисленная сверх ожидаемой, по всем ошибкам */
+/** Сумма, начисленная сверх ожидаемой, по ошибкам, где известны обе суммы */
 export const overpayment = (errors = []) =>
   errors.reduce(
-    (s, e) => s + Math.max(0, (e.actual ?? 0) - (e.expected ?? 0)),
+    (s, e) =>
+      e.actual != null && e.expected != null
+        ? s + Math.max(0, e.actual - e.expected)
+        : s,
     0,
   );
 

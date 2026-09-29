@@ -1,18 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Avatar, CellList, CellSimple, Counter } from "@maxhub/max-ui";
 import { Card, IconBubble, PageHeader } from "../components/ui";
-import {
-  IconBell,
-  IconHelp,
-  IconLogout,
-  IconShield,
-  IconSparkle,
-} from "../components/Icons";
+import { IconBell, IconHelp, IconShield } from "../components/Icons";
 import { useUser } from "../hooks/useUser";
 import { initials } from "../utils/format";
 import { NOTIFICATIONS } from "../data/content";
 import { bridge } from "../bridge/max";
-import { ONBOARDING_KEY } from "../constants";
 
 export const Profile = () => {
   const navigate = useNavigate();
@@ -22,12 +15,6 @@ export const Profile = () => {
   const go = (to) => () => {
     bridge.haptic.impact("light");
     navigate(to);
-  };
-
-  const logout = async () => {
-    bridge.haptic.notify("warning");
-    await bridge.storage.remove(ONBOARDING_KEY);
-    navigate("/", { replace: true });
   };
 
   return (
@@ -101,19 +88,6 @@ export const Profile = () => {
           showChevron
         />
       </CellList>
-
-      <Card tone="info" className="promo">
-        <div className="promo__title">
-          <IconSparkle size={18} /> ДомКвит Plus
-        </div>
-        <p className="small">
-          Автоматическая загрузка квитанций из УК и напоминания об оплате.
-        </p>
-      </Card>
-
-      <button type="button" className="card logout-button" onClick={logout}>
-        <IconLogout size={20} /> Выйти из аккаунта
-      </button>
     </>
   );
 };

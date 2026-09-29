@@ -1,13 +1,13 @@
-import { request, USE_MOCK } from "./client";
+import { ApiError, apiUrl, currentUserId, request, USE_MOCK } from "./client";
 import * as mock from "./mock";
 
 /*
- * Пути эндпоинтов — предварительные, согласовать с бэкендом.
- * GET  /receipts                → список квитанций
- * GET  /receipts/:id            → квитанция с service_charges, meter_infos, coefficients, recalculations
- * GET  /receipts/:id/check      → { receipt_id, has_errors, errors[], checked_at }
- * POST /receipts (file)         → распознанная квитанция (или { id })
- * POST /receipts/:id/complaint  → { text } или { pdf_url }
+ * Эндпоинты бэкенда (backend/app/api/receipts.py):
+ * GET  /receipts/user/{max_user_id}    → список квитанций (404, если пользователь ещё ничего не загружал)
+ * GET  /receipts/{id}                  → квитанция с service_charges, meter_infos, coefficients, recalculations
+ * POST /receipts/check/{id}            → { receipt_id, has_errors, errors[], checked_at } (результат сохраняется)
+ * POST /receipts/upload/{max_user_id}  → распознанная квитанция без вложенных таблиц, поле формы file
+ * GET  /receipts/{id}/complaint        → PDF претензии
  */
 
 const cache = new Map();
@@ -26,9 +26,15 @@ const cached = (key, load) => {
 };
 
 export const getReceipts = () =>
-  cached("receipts", () =>
-    USE_MOCK ? mock.getReceipts() : request("/receipts"),
-  );
+  cached("receipts", async () => {
+    if (USE_MOCK) return mock.getReceipts();
+    try {
+      return await request(`/receipts/user/${currentUserId()}`);
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 404) return [];
+      throw e;
+    }
+  });
 
 export const getReceipt = (id) =>
   cached(`receipt:${id}`, () =>
@@ -37,7 +43,9 @@ export const getReceipt = (id) =>
 
 export const getReceiptCheck = (id) =>
   cached(`check:${id}`, () =>
-    USE_MOCK ? mock.getReceiptCheck(id) : request(`/receipts/${id}/check`),
+    USE_MOCK
+      ? mock.getReceiptCheck(id)
+      : request(`/receipts/check/${id}`, { method: "POST" }),
   );
 
 export const uploadReceipt = async (file) => {
@@ -47,15 +55,23 @@ export const uploadReceipt = async (file) => {
   } else {
     const body = new FormData();
     body.append("file", file);
-    receipt = await request("/receipts", { method: "POST", body });
+    receipt = await request(`/receipts/upload/${currentUserId()}`, {
+      method: "POST",
+      body,
+    });
   }
   cache.clear();
   return receipt.service_charges ? receipt : getReceipt(receipt.id);
 };
 
+/**
+ * { text } — в мок-режиме;
+ * { pdf_url, blob_url } — от бэкенда: pdf_url для скачивания через MAX, blob_url — в браузере
+ */
 export const createComplaint = (id) =>
-  cached(`complaint:${id}`, () =>
-    USE_MOCK
-      ? mock.createComplaint(id)
-      : request(`/receipts/${id}/complaint`, { method: "POST" }),
-  );
+  cached(`complaint:${id}`, async () => {
+    if (USE_MOCK) return mock.createComplaint(id);
+    const path = `/receipts/${id}/complaint`;
+    const blob = await request(path, { as: "blob" });
+    return { pdf_url: apiUrl(path), blob_url: URL.createObjectURL(blob) };
+  });

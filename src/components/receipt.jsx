@@ -121,13 +121,24 @@ export const CheckSummary = ({ receiptId, check }) => {
 
 export const ErrorItem = ({ error }) => {
   const hasValues = error.actual != null && error.expected != null;
-  const diff = hasValues ? error.actual - error.expected : 0;
+  const diff = error.delta ?? (hasValues ? error.actual - error.expected : 0);
   return (
     <Card className="error-item">
-      <Badge tone={severityTone(error.severity)}>
-        {errorTypeLabel(error.type)}
-      </Badge>
+      <div className="error-item__badges">
+        <Badge tone={severityTone(error.severity)}>
+          {errorTypeLabel(error.type)}
+        </Badge>
+        {error.confidence === "needs_proof" && (
+          <Badge tone="neutral">Нужно обоснование</Badge>
+        )}
+      </div>
       <p className="error-item__text">{error.description}</p>
+      {error.recommended_action && (
+        <p className="error-item__action">{error.recommended_action}</p>
+      )}
+      {error.legal_ref && (
+        <span className="muted small">{error.legal_ref}</span>
+      )}
       {hasValues && (
         <div className="error-item__values">
           <div>

@@ -42,52 +42,52 @@ export const Home = () => {
       {loading && <LoadingState />}
       {error && <ErrorState error={error} onRetry={retry} />}
 
-      {!loading && !error && latest && (
-        <ReceiptHero
-          receipt={latest}
-          previous={previous}
-          label={`К оплате за ${String(latest.period_month).toLowerCase()} ${latest.period_year}`}
-          badge={
-            <Badge tone="on-accent">{statusInfo(latest.status).label}</Badge>
-          }
-        >
-          <Button
-            variant="primary-contrast"
-            size="medium"
-            stretched
-            onClick={() => {
-              bridge.haptic.impact("light");
-              navigate(`/receipts/${latest.id}`);
-            }}
+      <div className="home-body">
+        {!loading && !error && latest ? (
+          <ReceiptHero
+            receipt={latest}
+            previous={previous}
+            label={`К оплате за ${String(latest.period_month).toLowerCase()} ${latest.period_year}`}
+            badge={
+              <Badge tone="on-accent">{statusInfo(latest.status).label}</Badge>
+            }
           >
-            Открыть детали
-          </Button>
-        </ReceiptHero>
-      )}
+            <Button
+              variant="primary-contrast"
+              size="medium"
+              stretched
+              onClick={() => {
+                bridge.haptic.impact("light");
+                navigate(`/receipts/${latest.id}`);
+              }}
+            >
+              Открыть детали
+            </Button>
+          </ReceiptHero>
+        ) : !loading && !error ? (
+          <Card className="empty-card" onClick={() => navigate("/receipts/add")}>
+            <IconUpload size={28} />
+            <b>Загрузите первую квитанцию</b>
+            <span className="muted small">
+              Мы распознаем начисления и проверим их на ошибки
+            </span>
+          </Card>
+        ) : null}
 
-      {!loading && !error && !latest && (
-        <Card className="empty-card" onClick={() => navigate("/receipts/add")}>
-          <IconUpload size={28} />
-          <b>Загрузите первую квитанцию</b>
-          <span className="muted small">
-            Мы распознаем начисления и проверим их на ошибки
-          </span>
-        </Card>
-      )}
-
-      <div className="grid-2">
-        <Card className="action-tile" onClick={() => navigate("/receipts/add")}>
-          <span className="action-tile__icon">
-            <IconPlus size={20} />
-          </span>
-          Добавить квитанцию
-        </Card>
-        <Card className="action-tile" onClick={() => navigate("/assistant")}>
-          <span className="action-tile__icon">
-            <IconSparkle size={20} />
-          </span>
-          Спросить AI
-        </Card>
+        <div className="grid-2">
+          <Card className="action-tile" onClick={() => navigate("/receipts/add")}>
+            <span className="action-tile__icon">
+              <IconPlus size={20} />
+            </span>
+            Добавить квитанцию
+          </Card>
+          <Card className="action-tile" onClick={() => navigate("/assistant")}>
+            <span className="action-tile__icon">
+              <IconSparkle size={20} />
+            </span>
+            Спросить AI
+          </Card>
+        </div>
       </div>
     </>
   );
