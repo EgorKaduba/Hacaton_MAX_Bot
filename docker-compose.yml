@@ -30,6 +30,14 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/uploads:/app/uploads
+      
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
 
 volumes:
   pgdata:

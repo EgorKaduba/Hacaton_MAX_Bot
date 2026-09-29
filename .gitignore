@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .idea/
-
 .env
+frontend/node_modules/
+frontend/dist/
 uploads/
