@@ -151,6 +151,13 @@ async def check_receipt_endpoint(
 @router.get(
     "/{receipt_id}/complaint",
     summary="генерация жалобы на квитанцию",
+    response_class=Response,
+    responses={
+        200: {
+            "content": {"application/pdf": {}},
+            "description": "PDF-жалоба",
+        }
+    },
 )
 async def get_complaint(
     receipt_id: int,
