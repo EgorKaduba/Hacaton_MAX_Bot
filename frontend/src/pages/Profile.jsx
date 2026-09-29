@@ -1,15 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { Avatar, CellList, CellSimple, Counter } from "@maxhub/max-ui";
+import { CellList, CellSimple, Counter } from "@maxhub/max-ui";
 import { Card, IconBubble, PageHeader } from "../components/ui";
-import { IconBell, IconHelp, IconShield } from "../components/Icons";
-import { useUser } from "../hooks/useUser";
-import { initials } from "../utils/format";
+import { IconBell, IconHelp, IconUser } from "../components/Icons";
 import { NOTIFICATIONS } from "../data/content";
 import { bridge } from "../bridge/max";
 
 export const Profile = () => {
   const navigate = useNavigate();
-  const user = useUser();
   const unread = NOTIFICATIONS.filter((n) => n.unread).length;
 
   const go = (to) => () => {
@@ -22,27 +19,16 @@ export const Profile = () => {
       <PageHeader
         back="Главная"
         title="Профиль"
-        subtitle="Управление аккаунтом"
+        subtitle="Настройки и уведомления"
       />
 
       <Card className="profile-card">
-        <Avatar.Container size={56} form="circle">
-          {user.photoUrl ? (
-            <Avatar.Image src={user.photoUrl} alt="" />
-          ) : (
-            <Avatar.Text gradient="blue">
-              {initials(user.firstName, user.lastName)}
-            </Avatar.Text>
-          )}
-        </Avatar.Container>
+        <span className="avatar-fallback avatar-fallback--lg">
+          <IconUser size={28} />
+        </span>
         <div>
-          <b className="profile-card__name">
-            {user.firstName} {user.lastName}
-          </b>
-          <span className="muted small">
-            {user.username ? `@${user.username}` : user.email}
-          </span>
-          <span className="muted small">{user.address}</span>
+          <b className="profile-card__name">Аккаунт</b>
+          <span className="muted small">Уведомления и помощь</span>
         </div>
       </Card>
 
@@ -73,18 +59,6 @@ export const Profile = () => {
             </IconBubble>
           }
           title="Помощь и FAQ"
-          showChevron
-        />
-
-        <CellSimple
-          as="button"
-          onClick={go("/help#security")}
-          before={
-            <IconBubble size={32} color="var(--dk-success)">
-              <IconShield size={18} />
-            </IconBubble>
-          }
-          title="Безопасность данных"
           showChevron
         />
       </CellList>

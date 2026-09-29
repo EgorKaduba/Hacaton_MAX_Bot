@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Spinner, Typography } from "@maxhub/max-ui";
 import { Badge, Card, ErrorState, PageHeader, ProgressRing } from "../components/ui";
 import { IconCheck } from "../components/Icons";
@@ -17,6 +17,11 @@ const STEPS = [
 
 const RecognitionProcess = ({ file }) => {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const addPath =
+    params.get("from") === "receipts"
+      ? "/receipts/add?from=receipts"
+      : "/receipts/add";
   const { setReceipt } = useDraft();
   const { progress, error, retry } = useProcess(() => uploadReceipt(file), {
     minDuration: 4000,
@@ -40,7 +45,7 @@ const RecognitionProcess = ({ file }) => {
           variant="secondary"
           size="large"
           stretched
-          onClick={() => navigate("/receipts/add", { replace: true })}
+          onClick={() => navigate(addPath, { replace: true })}
         >
           Выбрать другой файл
         </Button>

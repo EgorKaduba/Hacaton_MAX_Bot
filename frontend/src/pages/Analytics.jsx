@@ -60,7 +60,7 @@ const serviceSegments = (items, withLinks) => {
     color: PALETTE[i],
     link: withLinks ? c.link : undefined,
   }));
-  const rest = sorted.slice(TOP_SERVICES);
+      const rest = sorted.slice(TOP_SERVICES);
   if (rest.length) {
     segments.push({
       id: "rest",
@@ -68,6 +68,12 @@ const serviceSegments = (items, withLinks) => {
       hint: `ещё ${rest.length} усл.`,
       value: rest.reduce((s, c) => s + c.total, 0),
       color: REST_COLOR,
+      restItems: rest.map((c) => ({
+        id: c.service_name,
+        label: serviceTitle(c.service_name),
+        value: c.total,
+        link: withLinks ? c.link : undefined,
+      })),
     });
   }
   return segments;
@@ -75,6 +81,7 @@ const serviceSegments = (items, withLinks) => {
 
 const PeriodStructure = ({ period }) => {
   const isMonth = period.receipts.length === 1;
+  const [restOpen, setRestOpen] = useState(null);
   const { data: receipts, error, loading, retry } = useApi(
     () => Promise.all(period.receipts.map((r) => getReceipt(r.id))),
     [period.id],
@@ -97,6 +104,7 @@ const PeriodStructure = ({ period }) => {
   const share = (v) => (total > 0 ? Math.round((v / total) * 100) : 0);
 
   return (
+    <>
     <div className="analytics-grid">
       <Card>
         <SectionHeader title="Структура расходов" />
@@ -113,6 +121,8 @@ const PeriodStructure = ({ period }) => {
             <Row
               key={s.id}
               to={s.link}
+              onClick={s.restItems ? () => setRestOpen(s) : undefined}
+              chevron={Boolean(s.link || s.restItems)}
               before={<Dot color={s.color} />}
               title={s.label}
               subtitle={s.hint}
@@ -141,6 +151,24 @@ const PeriodStructure = ({ period }) => {
         </div>
       </Card>
     </div>
+
+      <Sheet
+        open={Boolean(restOpen)}
+        onClose={() => setRestOpen(null)}
+        title="Остальное"
+      >
+        {restOpen?.restItems?.map((item) => (
+          <Row
+            key={item.id}
+            to={item.link}
+            chevron={Boolean(item.link)}
+            title={item.label}
+            after={rub(item.value)}
+            afterSub={`${share(item.value)}%`}
+          />
+        ))}
+      </Sheet>
+    </>
   );
 };
 

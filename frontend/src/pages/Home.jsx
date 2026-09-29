@@ -12,7 +12,6 @@ import { ReceiptHero } from "../components/receipt";
 import { IconPlus, IconSparkle, IconUpload } from "../components/Icons";
 import { getReceipts } from "../api/receipts";
 import { useApi } from "../hooks/useApi";
-import { useUser } from "../hooks/useUser";
 import { greeting } from "../utils/format";
 import {
   findPrevious,
@@ -23,7 +22,6 @@ import { bridge } from "../bridge/max";
 
 export const Home = () => {
   const navigate = useNavigate();
-  const user = useUser();
   const { data, error, loading, retry } = useApi(getReceipts);
 
   const receipts = sortReceipts(data ?? []);
@@ -34,8 +32,8 @@ export const Home = () => {
     <>
       <PageHeader
         large
-        title={`${greeting()}, ${user.firstName}`}
-        subtitle={user.address}
+        title={greeting()}
+        subtitle="Квитанции и проверка начислений"
         right={<UserAvatar />}
       />
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, IconBubble, Notice, PageHeader } from "../components/ui";
 import { IconChevronRight, IconLock, IconUpload } from "../components/Icons";
 import { useDraft } from "../state/draft";
@@ -9,6 +9,8 @@ const MAX_SIZE = 10 * 1024 * 1024;
 
 export const AddReceipt = () => {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const fromReceipts = params.get("from") === "receipts";
   const { start } = useDraft();
   const fileRef = useRef(null);
   const [error, setError] = useState(null);
@@ -30,13 +32,21 @@ export const AddReceipt = () => {
     setError(null);
     bridge.haptic.notify("success");
     start(file);
-    navigate("/receipts/add/recognition");
+    navigate(
+      fromReceipts
+        ? "/receipts/add/recognition?from=receipts"
+        : "/receipts/add/recognition",
+    );
   };
 
   return (
     <>
       <PageHeader
-        back="Главная"
+        back={
+          fromReceipts
+            ? { label: "Квитанции", to: "/receipts" }
+            : { label: "Главная", to: "/home" }
+        }
         title="Добавить квитанцию"
         subtitle="Загрузите файл квитанции"
       />

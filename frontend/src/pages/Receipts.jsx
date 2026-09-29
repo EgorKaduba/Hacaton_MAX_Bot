@@ -54,7 +54,7 @@ export const Receipts = () => {
         size="large"
         stretched
         iconBefore={<IconPlus size={20} />}
-        onClick={() => navigate("/receipts/add")}
+        onClick={() => navigate("/receipts/add?from=receipts")}
       >
         Добавить квитанцию
       </Button>

@@ -53,10 +53,3 @@ export const FAQ = [
     a: "Добровольное страхование — необязательная услуга. В квитанции есть две суммы: с учётом страхования и без него.",
   },
 ];
-
-export const USER_FALLBACK = {
-  firstName: "Анна",
-  lastName: "Кузнецова",
-  email: "anna.kuznetsova@mail.ru",
-  address: "ул. Садовая, 12, кв. 42",
-};

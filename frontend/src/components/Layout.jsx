@@ -11,7 +11,8 @@ export const TabLayout = () => (
 );
 
 export const PlainLayout = () => (
-  <div className="screen">
+  <div className="screen screen--plain">
+    <TabBar />
     <main className="screen__content">
       <Outlet />
     </main>

@@ -173,3 +173,9 @@ export const IconLock = (p) => (
     <path d="M8 10V7a4 4 0 0 1 8 0v3" />
   </svg>
 );
+export const IconUser = (p) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="8" r="3.5" />
+    <path d="M5 19.5c1.4-3.2 3.8-5 7-5s5.6 1.8 7 5" />
+  </svg>
+);

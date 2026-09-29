@@ -1,14 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Avatar, Button, Flex, Spinner, Typography } from "@maxhub/max-ui";
+import { Button, Flex, Spinner, Typography } from "@maxhub/max-ui";
 import {
   IconAlert,
   IconChevronLeft,
   IconChevronRight,
   IconClose,
+  IconUser,
 } from "./Icons";
 import { bridge } from "../bridge/max";
-import { initials } from "../utils/format";
-import { useUser } from "../hooks/useUser";
 
 const cx = (...c) => c.filter(Boolean).join(" ");
 
@@ -47,32 +46,18 @@ export const PageHeader = ({ title, subtitle, back, right, large }) => {
   );
 };
 
-export const UserAvatar = ({ size = 36 }) => {
-  const user = useUser();
-  return (
-    <Link
-      to="/profile"
-      className="avatar-link"
-      aria-label="Профиль"
-      onClick={() => bridge.haptic.impact("light")}
-    >
-      <Avatar.Container size={size} form="circle">
-        {user.photoUrl ? (
-          <Avatar.Image
-            src={user.photoUrl}
-            alt=""
-            fallback={initials(user.firstName, user.lastName)}
-            fallbackGradient="blue"
-          />
-        ) : (
-          <Avatar.Text gradient="blue">
-            {initials(user.firstName, user.lastName)}
-          </Avatar.Text>
-        )}
-      </Avatar.Container>
-    </Link>
-  );
-};
+export const UserAvatar = ({ size = 36 }) => (
+  <Link
+    to="/profile"
+    className="avatar-link"
+    aria-label="Профиль"
+    onClick={() => bridge.haptic.impact("light")}
+  >
+    <span className="avatar-fallback" style={{ width: size, height: size }}>
+      <IconUser size={Math.round(size * 0.5)} />
+    </span>
+  </Link>
+);
 
 /* ---------- Surfaces ---------- */
 
