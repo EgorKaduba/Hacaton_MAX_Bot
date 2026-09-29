@@ -258,33 +258,35 @@ export const Donut = ({ segments, size = 180, stroke = 24, children }) => {
 
 export const ProgressRing = ({ value, size = 132, stroke = 10 }) => {
   const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
+  const cx = size / 2;
+  const cy = size / 2;
+  const pct = Math.min(100, Math.max(0, Number(value) || 0));
   return (
     <div className="progress-ring" style={{ width: size, height: size }}>
-      <svg width={size} height={size}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={cx}
+          cy={cy}
           r={r}
+          fill="none"
           stroke="var(--dk-accent-soft)"
           strokeWidth={stroke}
-          fill="none"
         />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke="var(--dk-accent)"
-          strokeWidth={stroke}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - value / 100)}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dashoffset .4s ease" }}
-        />
+        <g transform={`rotate(-90 ${cx} ${cy})`}>
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke="var(--dk-accent)"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            pathLength="100"
+            strokeDasharray={`${pct} 100`}
+          />
+        </g>
       </svg>
-      <span className="progress-ring__value">{Math.round(value)}%</span>
+      <span className="progress-ring__value">{Math.round(pct)}%</span>
     </div>
   );
 };

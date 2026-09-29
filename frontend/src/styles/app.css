@@ -389,6 +389,7 @@ p {
 .processing { align-items: center; gap: 12px; padding: 24px var(--dk-pad); text-align: center; }
 
 .progress-ring { position: relative; }
+.progress-ring svg { display: block; overflow: visible; }
 .progress-ring__value {
   position: absolute;
   inset: 0;
