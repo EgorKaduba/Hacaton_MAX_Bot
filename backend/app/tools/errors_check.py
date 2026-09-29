@@ -211,7 +211,7 @@ def find_debt_mismatch(receipt: Receipt) -> list[dict]:
                 "confidence": "confirmed",
                 "description": (
                     f"Услуга «{sc.service_name}»: переплата "
-                    f"{overpay:.2f} ₽"
+                    f"{overpay:.2f} руб."
                 ),
                 "expected": round(due, 2),
                 "actual": round(paid, 2),
@@ -295,7 +295,7 @@ def find_unjustified_recalculation(receipt: Receipt) -> list[dict]:
                 "confidence": "needs_proof",
                 "description": (
                     f"Перерасчёт по «{sc.service_name}» на "
-                    f"{recalc_amount:.2f} ₽ указан в строке услуги, "
+                    f"{recalc_amount:.2f} руб. указан в строке услуги, "
                     f"но отсутствует в таблице перерасчётов"
                 ),
                 "expected": None,
@@ -315,7 +315,7 @@ def find_unjustified_recalculation(receipt: Receipt) -> list[dict]:
                 "confidence": "needs_proof",
                 "description": (
                     f"Перерасчёт по «{sc.service_name}» на "
-                    f"{recalc_amount:.2f} ₽ указан без основания"
+                    f"{recalc_amount:.2f} руб. указан без основания"
                 ),
                 "expected": None,
                 "actual": round(recalc_amount, 2),
@@ -334,8 +334,8 @@ def find_unjustified_recalculation(receipt: Receipt) -> list[dict]:
                 "confidence": "confirmed",
                 "description": (
                     f"Перерасчёт по «{sc.service_name}»: "
-                    f"в строке услуги {recalc_amount:.2f} ₽, "
-                    f"в таблице перерасчётов {rec_amount:.2f} ₽"
+                    f"в строке услуги {recalc_amount:.2f} руб., "
+                    f"в таблице перерасчётов {rec_amount:.2f} руб."
                 ),
                 "expected": round(rec_amount, 2),
                 "actual": round(recalc_amount, 2),
@@ -447,9 +447,9 @@ def find_coefficient_mismatch(receipt: Receipt) -> list[dict]:
                 "confidence": "confirmed",
                 "description": (
                     f"По услуге «{c.service_name}» применён коэффициент "
-                    f"{coef}: базовое начисление {base_amount:.2f} ₽, "
-                    f"превышение должно быть {expected_excess:.2f} ₽, "
-                    f"а указано {actual_excess:.2f} ₽"
+                    f"{coef}: базовое начисление {base_amount:.2f} руб., "
+                    f"превышение должно быть {expected_excess:.2f} руб., "
+                    f"а указано {actual_excess:.2f} руб."
                 ),
                 "expected": round(expected_excess, 2),
                 "actual": round(actual_excess, 2),

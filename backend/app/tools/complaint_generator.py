@@ -92,7 +92,7 @@ def render_confirmed_block(pdf: FPDF, errors: list[dict], section: int) -> None:
     )
     pdf.ln(2)
     pdf.set_font("Liberation Serif", "B", size=11)
-    pdf.cell(0, 6, f"Итого к перерасчёту: {total_delta:.2f} ₽", ln=1)
+    pdf.cell(0, 6, f"Итого к перерасчёту: {total_delta:.2f} руб.", ln=1)
     pdf.ln(4)
 
 
@@ -171,11 +171,11 @@ def render_requirements(
         delta = e.get("delta")
 
         if service and delta is not None:
-            text = f"{n}. {action} по услуге «{service}» на сумму {float(delta):.2f} ₽."
+            text = f"{n}. {action} по услуге «{service}» на сумму {float(delta):.2f} руб.."
         elif service:
             text = f"{n}. {action} по услуге «{service}»."
         elif delta is not None:
-            text = f"{n}. {action} на сумму {float(delta):.2f} ₽."
+            text = f"{n}. {action} на сумму {float(delta):.2f} руб.."
         else:
             text = f"{n}. {action}."
 
