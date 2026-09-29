@@ -1,14 +1,6 @@
 import { ApiError, apiUrl, currentUserId, request, USE_MOCK } from "./client";
 import * as mock from "./mock";
 
-/*
- * Эндпоинты бэкенда (backend/app/api/receipts.py):
- * GET  /receipts/user/{max_user_id}    → список квитанций (404, если пользователь ещё ничего не загружал)
- * GET  /receipts/{id}                  → квитанция с service_charges, meter_infos, coefficients, recalculations
- * POST /receipts/check/{id}            → { receipt_id, has_errors, errors[], checked_at } (результат сохраняется)
- * POST /receipts/upload/{max_user_id}  → распознанная квитанция без вложенных таблиц, поле формы file
- * GET  /receipts/{id}/complaint        → PDF претензии
- */
 
 const cache = new Map();
 
@@ -64,10 +56,6 @@ export const uploadReceipt = async (file) => {
   return receipt.service_charges ? receipt : getReceipt(receipt.id);
 };
 
-/**
- * { text } — в мок-режиме;
- * { pdf_url, blob_url } — от бэкенда: pdf_url для скачивания через MAX, blob_url — в браузере
- */
 export const createComplaint = (id) =>
   cached(`complaint:${id}`, async () => {
     if (USE_MOCK) return mock.createComplaint(id);

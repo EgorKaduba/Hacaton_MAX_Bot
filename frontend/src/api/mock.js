@@ -9,7 +9,6 @@ const JULY = {
   total_without_insurance: 8688.98,
   total_with_insurance: 8863.63,
   status: "parsed",
-  payment_url: "https://example.com/pay?receipt=3&sum=8863.63",
   service_charges: [
     { id: 13, section: "жилищные", service_name: "ВЗНОС НА КОПИТАЛЬНЫЙ РЕМОН", volume: 49.9, unit: "кв.м", tariff: 22, amount: 1097.8, benefit: null, recalculation: 0, debt_start: 1097.8, paid: 1097.8, total: 1097.8 },
     { id: 14, section: "коммунальные", service_name: "ВОДООТВЕДЕНИЕ", volume: 7.57, unit: "куб. м.", tariff: 49.67, amount: 376, benefit: null, recalculation: 0, debt_start: 376, paid: 376, total: 376 },
@@ -39,7 +38,6 @@ const JULY = {
 const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits;
 const round2 = (v) => round(v, 2);
 
-/** Квитанция за другой месяц на основе июльской: меняются объёмы, без перерасчётов и коэффициентов */
 const deriveReceipt = (base, { id, month, year, volumes, reading }) => {
   const service_charges = base.service_charges.map((c, i) => {
     const volume = volumes[c.service_name] ?? c.volume;
@@ -67,7 +65,6 @@ const deriveReceipt = (base, { id, month, year, volumes, reading }) => {
     total_without_insurance: round2(total - insurance),
     total_with_insurance: total,
     status: "parsed",
-    payment_url: `https://example.com/pay?receipt=${id}&sum=${total}`,
     service_charges,
     meter_infos: [
       {
@@ -85,7 +82,6 @@ const deriveReceipt = (base, { id, month, year, volumes, reading }) => {
   };
 };
 
-/** Предыдущие месяцы, от новых к старым: множители объёмов воды и ГВС к июлю и расход электроэнергии */
 const HISTORY = [
   { id: 2, month: "июнь", year: 2026, water: 1.07, hot: 1.13, kwh: 171 },
   { id: 1, month: "май", year: 2026, water: 1.04, hot: 1.07, kwh: 180 },

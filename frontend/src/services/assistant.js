@@ -101,7 +101,6 @@ const answerService = ({ latest }, question) => {
   };
 };
 
-/** Ответ в мок-режиме: собирается из данных квитанций без бэкенда */
 const askMock = async (question) => {
   const [ctx] = await Promise.all([
     loadContext(),
@@ -112,10 +111,6 @@ const askMock = async (question) => {
   const q = question.toLowerCase();
   if (q.includes("ошиб") || q.includes("жалоб")) return answerErrors(ctx);
   if (q.includes("перерасч")) return answerRecalculations(ctx);
-  if (q.includes("оплат"))
-    return {
-      text: "Откройте квитанцию и нажмите «Оплатить» — откроется ссылка из QR-кода вашей квитанции. Рядом есть кнопка с QR-кодом, его можно отсканировать приложением банка.",
-    };
   return answerService(ctx, question) ?? answerChanges(ctx);
 };
 
@@ -126,5 +121,4 @@ export const SUGGESTIONS = [
   "Почему изменилась сумма?",
   "Есть ли ошибки в квитанции?",
   "Что за перерасчёт?",
-  "Как оплатить?",
 ];

@@ -1,6 +1,5 @@
 import { periodKey, periodLabel, sortReceipts } from "./receipt";
 
-/** По одной квитанции на месяц (при повторной загрузке — более новая), от новых к старым */
 export const uniquePeriods = (receipts = []) => {
   const seen = new Set();
   return sortReceipts(receipts).filter((r) => {
@@ -11,17 +10,11 @@ export const uniquePeriods = (receipts = []) => {
   });
 };
 
-/** «Август 2025 — Июль 2026» */
 export const rangeCaption = (receipts) =>
   receipts.length > 1
     ? `${periodLabel(receipts[receipts.length - 1])} — ${periodLabel(receipts[0])}`
     : periodLabel(receipts[0]);
 
-/**
- * months — каждый месяц отдельно, ranges — сводные периоды.
- * Период попадает в ranges, только если в нём больше одного месяца
- * и набор месяцев не совпадает с уже добавленным периодом.
- */
 export const buildPeriods = (receipts) => {
   const list = uniquePeriods(receipts);
   const months = list.map((r) => ({

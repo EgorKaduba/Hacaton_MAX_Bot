@@ -33,7 +33,6 @@ const REST_COLOR = "#c3cad4";
 const SECTION_COLORS = ["#1a73ff", "#ff8a3d", "#7b61ff", "#12b76a"];
 const TOP_SERVICES = 6;
 
-/** Суммирует начисления по услуге за все квитанции периода */
 const aggregateCharges = (receipts) => {
   const byService = new Map();
   for (const r of receipts) {

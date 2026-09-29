@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Запускает run() один раз и анимирует прогресс: до 95% пока запрос идёт,
- * 100% — когда он завершился и прошло не меньше minDuration.
- */
 export const useProcess = (run, { minDuration = 2500, onDone } = {}) => {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
@@ -47,7 +43,6 @@ export const useProcess = (run, { minDuration = 2500, onDone } = {}) => {
       active = false;
       cancelAnimationFrame(raf);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attempt, minDuration]);
 
   const retry = () => {

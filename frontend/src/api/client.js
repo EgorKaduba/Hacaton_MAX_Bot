@@ -33,7 +33,6 @@ const errorMessage = async (res) => {
     const { detail } = JSON.parse(text);
     if (typeof detail === "string") return DETAILS[detail] ?? detail;
   } catch {
-    /* не JSON — вернём общий текст */
   }
   return res.status >= 500 || !text ? "" : text;
 };

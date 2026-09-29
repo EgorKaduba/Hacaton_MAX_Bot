@@ -10,7 +10,6 @@ const Ctx = createContext(null);
 
 const empty = { file: null, receipt: null, check: null };
 
-/** Состояние сценария «добавить квитанцию»: файл → распознанная квитанция → проверка */
 export const DraftProvider = ({ children }) => {
   const [draft, setDraft] = useState(empty);
 

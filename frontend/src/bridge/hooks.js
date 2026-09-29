@@ -10,7 +10,6 @@ const ROOT_ROUTES = new Set([
   "/assistant",
 ]);
 
-/** Синхронизирует нативную кнопку «Назад» MAX с роутером */
 export const useMaxBackButton = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,7 +33,6 @@ export const useMaxBackButton = () => {
   }, [location.pathname, navigate]);
 };
 
-/** Предупреждение о потере данных при закрытии мини-приложения */
 export const useClosingConfirmation = (enabled = true) => {
   useEffect(() => {
     if (!enabled) return;

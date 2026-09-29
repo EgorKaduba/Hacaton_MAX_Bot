@@ -1,11 +1,7 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@maxhub/max-ui";
-import { QRCodeSVG } from "qrcode.react";
-import { Badge, Card, IconBubble, Notice, Sheet } from "./ui";
-import { IconAlert, IconCheckCircle, IconCopy, IconFile } from "./Icons";
-import { bridge } from "../bridge/max";
-import { copyText } from "../utils/clipboard";
+import { Badge, Card, IconBubble, Notice } from "./ui";
+import { IconAlert, IconCheckCircle, IconFile } from "./Icons";
 import {
   formatDate,
   num,
@@ -16,10 +12,8 @@ import {
 } from "../utils/format";
 import {
   errorTypeLabel,
-  isHttpUrl,
   monthDative,
   overpayment,
-  paymentLink,
   periodLabel,
   receiptTotal,
   severityTone,
@@ -161,55 +155,3 @@ export const ErrorItem = ({ error }) => {
   );
 };
 
-export const PaymentSheet = ({ open, onClose, receipt }) => {
-  const link = paymentLink(receipt);
-  const [copied, setCopied] = useState(false);
-
-  const copy = async () => {
-    if (await copyText(link)) {
-      bridge.haptic.notify("success");
-      setCopied(true);
-    }
-  };
-
-  return (
-    <Sheet open={open} onClose={onClose} title="QR-код для оплаты">
-      {link ? (
-        <>
-          <div className="qr-box">
-            <QRCodeSVG value={link} size={216} marginSize={2} />
-          </div>
-          <p className="muted small center">
-            Отсканируйте код в приложении банка
-            {isHttpUrl(link) && " или откройте ссылку для оплаты"}
-          </p>
-          {isHttpUrl(link) && (
-            <Button
-              size="large"
-              stretched
-              onClick={() => {
-                bridge.haptic.impact("medium");
-                bridge.openLink(link);
-              }}
-            >
-              Перейти к оплате
-            </Button>
-          )}
-          <Button
-            size="large"
-            variant="secondary"
-            stretched
-            iconBefore={<IconCopy size={18} />}
-            onClick={copy}
-          >
-            {copied ? "Скопировано" : "Скопировать ссылку"}
-          </Button>
-        </>
-      ) : (
-        <p className="muted center">
-          В квитанции не найден QR-код для оплаты
-        </p>
-      )}
-    </Sheet>
-  );
-};

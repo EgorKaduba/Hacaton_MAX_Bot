@@ -33,14 +33,12 @@ const capitalize = (s = "") => s.charAt(0).toUpperCase() + s.slice(1);
 export const monthIndex = (name) =>
   MONTHS.indexOf(String(name ?? "").trim().toLowerCase());
 
-/** «Июль 2026» */
 export const periodLabel = (r) => {
   if (!r) return "";
   if (!r.period_month && !r.period_year) return `Квитанция №${r.id}`;
   return `${capitalize(String(r.period_month ?? ""))} ${r.period_year ?? ""}`.trim();
 };
 
-/** «к июлю» */
 export const monthDative = (r) =>
   MONTHS_DAT[monthIndex(r?.period_month)] ?? r?.period_month ?? "";
 
@@ -50,7 +48,6 @@ export const periodKey = (r) =>
 export const sortReceipts = (list = []) =>
   [...list].sort((a, b) => periodKey(b) - periodKey(a) || b.id - a.id);
 
-/** Ближайшая более ранняя квитанция из отсортированного списка (дубли того же месяца пропускаются) */
 export const findPrevious = (sorted, r) =>
   sorted.find((x) => periodKey(x) < periodKey(r));
 
@@ -116,7 +113,6 @@ const ABBREVIATIONS = new Set([
   "Т3",
 ]);
 
-/** «ОБРАЩЕНИЕ С ТКО» → «Обращение с ТКО» */
 export const serviceTitle = (name = "") => {
   const text = name
     .trim()
@@ -143,7 +139,6 @@ const SEVERITY_TONES = {
 export const severityTone = (severity) =>
   SEVERITY_TONES[String(severity ?? "").toLowerCase()] ?? "warning";
 
-/** Типы ошибок из backend/app/tools/errors_check.py */
 const ERROR_TYPES = {
   arithmetic: "Ошибка в итоговой сумме",
   totals_mismatch: "Ошибка в итоге со страхованием",
@@ -161,7 +156,6 @@ const ERROR_TYPES = {
 
 export const errorTypeLabel = (type) => ERROR_TYPES[type] ?? "Ошибка";
 
-/** Сумма, начисленная сверх ожидаемой, по ошибкам, где известны обе суммы */
 export const overpayment = (errors = []) =>
   errors.reduce(
     (s, e) =>
@@ -170,7 +164,3 @@ export const overpayment = (errors = []) =>
         : s,
     0,
   );
-
-export const paymentLink = (receipt) => receipt?.payment_url ?? null;
-
-export const isHttpUrl = (value) => /^https?:\/\//i.test(value ?? "");

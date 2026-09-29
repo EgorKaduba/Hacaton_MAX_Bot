@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, IconButton } from "@maxhub/max-ui";
 import {
   Badge,
-  BottomBar,
   Card,
   ErrorState,
   LoadingState,
@@ -11,19 +8,13 @@ import {
   Row,
   SectionHeader,
 } from "../components/ui";
-import {
-  CheckSummary,
-  PaymentSheet,
-  chargeSubtitle,
-} from "../components/receipt";
-import { IconQr, IconShare } from "../components/Icons";
+import { CheckSummary, chargeSubtitle } from "../components/receipt";
+import { IconShare } from "../components/Icons";
 import { getReceipt, getReceiptCheck } from "../api/receipts";
 import { useApi } from "../hooks/useApi";
 import { num, rub, signedRub } from "../utils/format";
 import {
   groupBySection,
-  isHttpUrl,
-  paymentLink,
   periodLabel,
   receiptTotal,
   serviceTitle,
@@ -35,7 +26,6 @@ export const ReceiptDetails = () => {
   const { id } = useParams();
   const receiptReq = useApi(() => getReceipt(id), [id]);
   const checkReq = useApi(() => getReceiptCheck(id), [id]);
-  const [qrOpen, setQrOpen] = useState(false);
 
   const receipt = receiptReq.data;
   const period = periodLabel(receipt);
@@ -55,14 +45,7 @@ export const ReceiptDetails = () => {
       </>
     );
 
-  const link = paymentLink(receipt);
   const status = statusInfo(receipt.status);
-
-  const pay = () => {
-    bridge.haptic.impact("medium");
-    if (isHttpUrl(link)) bridge.openLink(link);
-    else setQrOpen(true);
-  };
 
   const share = () => {
     bridge.haptic.impact("light");
@@ -192,35 +175,6 @@ export const ReceiptDetails = () => {
           </div>
         </Card>
       )}
-
-      <BottomBar>
-        <IconButton
-          size="large"
-          variant="secondary"
-          aria-label="QR-код для оплаты"
-          disabled={!link}
-          onClick={() => {
-            bridge.haptic.impact("light");
-            setQrOpen(true);
-          }}
-        >
-          <IconQr size={22} />
-        </IconButton>
-        <Button size="large" stretched disabled={!link} onClick={pay}>
-          Оплатить {rub(receiptTotal(receipt))}
-        </Button>
-      </BottomBar>
-      {!link && (
-        <p className="hint-text center">
-          В квитанции не найден QR-код для оплаты
-        </p>
-      )}
-
-      <PaymentSheet
-        open={qrOpen}
-        onClose={() => setQrOpen(false)}
-        receipt={receipt}
-      />
     </>
   );
 };

@@ -11,8 +11,6 @@ import { bridge } from "../bridge/max";
 
 const cx = (...c) => c.filter(Boolean).join(" ");
 
-/* ---------- Header ---------- */
-
 export const PageHeader = ({ title, subtitle, back, right, large }) => {
   const navigate = useNavigate();
   const backLabel = typeof back === "string" ? back : back?.label;
@@ -58,8 +56,6 @@ export const UserAvatar = ({ size = 36 }) => (
     </span>
   </Link>
 );
-
-/* ---------- Surfaces ---------- */
 
 export const Card = ({ children, className, onClick, style, tone }) => {
   const cls = cx(
@@ -152,8 +148,6 @@ export const StatTile = ({ label, value, hint, hintTone, onClick }) => (
   </Card>
 );
 
-/* ---------- Lists ---------- */
-
 export const Row = ({
   before,
   title,
@@ -217,9 +211,6 @@ export const Dot = ({ color }) => (
   <span className="dot" style={{ background: color }} />
 );
 
-/* ---------- Charts ---------- */
-
-/** Кольцевая диаграмма: segments = [{ id, value, color }], value > 0 */
 export const Donut = ({ segments, size = 180, stroke = 24, children }) => {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
@@ -308,8 +299,6 @@ export const BottomBar = ({ children }) => (
   <div className="bottom-bar">{children}</div>
 );
 
-/* ---------- States ---------- */
-
 export const LoadingState = ({ text = "Загружаем…" }) => (
   <div className="state">
     <Spinner size={28} />
@@ -332,9 +321,6 @@ export const ErrorState = ({ error, onRetry, title }) => (
   </Card>
 );
 
-/* ---------- Sheet ---------- */
-
-/** Рендерится внутри корня MaxUI (не порталом), чтобы у компонентов MaxUI были его CSS-переменные */
 export const Sheet = ({ open, onClose, title, children }) => {
   if (!open) return null;
   return (

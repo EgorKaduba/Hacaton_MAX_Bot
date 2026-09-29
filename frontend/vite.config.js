@@ -5,7 +5,6 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const backend = env.BACKEND_URL || 'http://127.0.0.1:8000';
 
-  // В бэкенде нет CORS, поэтому браузер ходит на тот же адрес (/api), а Vite пересылает запросы бэкенду
   const proxy = {
     '/api': {
       target: backend,

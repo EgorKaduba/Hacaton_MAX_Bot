@@ -126,11 +126,6 @@ export const IconDownload = (p) => (
     <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
   </svg>
 );
-export const IconQr = (p) => (
-  <svg {...base(p)}>
-    <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 8h3v3H8zM13 13h3v3h-3zM13 8h3M8 13v3" />
-  </svg>
-);
 export const IconClose = (p) => (
   <svg {...base(p)}>
     <path d="M6 6l12 12M18 6 6 18" />

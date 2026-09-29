@@ -1,9 +1,3 @@
-/**
- * Обёртка над MAX Bridge (window.WebApp).
- * Вне клиента MAX (обычный браузер при разработке) объект есть, но initData пустой —
- * поэтому все методы безопасны и деградируют до браузерных аналогов.
- */
-
 const getWebApp = () => window.WebApp;
 
 export const isInsideMax = () => Boolean(getWebApp()?.initData);
@@ -22,7 +16,6 @@ export const bridge = {
     return getWebApp()?.platform ?? "web";
   },
 
-  /** Платформа для MaxUI: он умеет только ios | android */
   get uiPlatform() {
     const p = this.platform;
     if (p === "android") return "android";
@@ -108,7 +101,6 @@ export const bridge = {
           if (res == null || typeof res === "string") return res;
           return res.value ?? null;
         } catch {
-          /* desktop/web клиент MAX не поддерживает DeviceStorage */
         }
       }
       return localStorage.getItem(key);
@@ -119,7 +111,6 @@ export const bridge = {
           await getWebApp().DeviceStorage.setItem(key, value);
           return;
         } catch {
-          /* fallback ниже */
         }
       }
       localStorage.setItem(key, value);
@@ -129,7 +120,6 @@ export const bridge = {
         try {
           await getWebApp().DeviceStorage.removeItem(key);
         } catch {
-          /* fallback ниже */
         }
       }
       localStorage.removeItem(key);

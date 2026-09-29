@@ -62,7 +62,6 @@ export const Assistant = () => {
     lastAsked.current = queryParam;
     setParams({}, { replace: true });
     void send(queryParam);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParam]);
 
   useEffect(() => {
