@@ -1,12 +1,14 @@
 from datetime import datetime
 from fpdf import FPDF
+from pathlib import Path
 
 from ..models.receipt import Receipt
 from ..models.check_result import CheckResult
 
 
-FONT_REGULAR = "fonts/LiberationSerif-Regular.ttf"
-FONT_BOLD = "fonts/LiberationSerif-Bold.ttf"
+FONTS_DIR = Path(__file__).resolve().parent.parent.parent / "fonts"
+FONT_REGULAR = str(FONTS_DIR / "LiberationSerif-Regular.ttf")
+FONT_BOLD = str(FONTS_DIR / "LiberationSerif-Bold.ttf")
 
 
 def float_format(value) -> str:
