@@ -1,5 +1,7 @@
 .venv/
 __pycache__/
 .idea/
-
 .env
+frontend/node_modules/
+frontend/dist/
+
