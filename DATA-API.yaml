@@ -1,0 +1,146 @@
+schemaVersion: "1.0"
+
+solution:
+  name: "КвитДом"
+  teamId: "<team id>"
+
+api:
+  baseUrl: "https://api.example.org"
+  openapi: "./openapi.json"
+  defaultHeaders:
+    Accept: "application/json"
+
+checks:
+  - id: "upload-receipt"
+    name: "Загрузка квитанции"
+    description: "Принимает PDF-квитанцию и сохраняет её в БД"
+    method: "POST"
+    path: "/receipts/upload/1"
+    role: "public"
+    request:
+      headers:
+        Content-Type: "multipart/form-data"
+    expected:
+      statusCodes: [201]
+      contentType: "application/json"
+      requiredFields:
+        - "id"
+        - "period_month"
+        - "total_without_insurance"
+    timeoutMs: 10000
+    repeatable: false
+    extract:
+      receiptId: "$.id"
+
+  - id: "get-receipts-list"
+    name: "Список квитанций пользователя"
+    description: "Возвращает список квитанций по max_user_id"
+    method: "GET"
+    path: "/receipts/user/1"
+    role: "public"
+    expected:
+      statusCodes: [200]
+      contentType: "application/json"
+    timeoutMs: 5000
+    repeatable: true
+
+  - id: "get-receipt-detail"
+    name: "Детали квитанции"
+    description: "Возвращает квитанцию со всеми связанными данными"
+    method: "GET"
+    path: "/receipts/{receiptId}"
+    role: "public"
+    dependsOn:
+      - "upload-receipt"
+    request:
+      path:
+        receiptId: "${receiptId}"
+    expected:
+      statusCodes: [200]
+      contentType: "application/json"
+      requiredFields:
+        - "id"
+        - "period_month"
+        - "service_charges"
+    timeoutMs: 5000
+    repeatable: true
+
+  - id: "check-receipt"
+    name: "Проверка квитанции на ошибки"
+    description: "Анализирует начисления и возвращает найденные ошибки"
+    method: "POST"
+    path: "/receipts/check/{receiptId}"
+    role: "public"
+    dependsOn:
+      - "upload-receipt"
+    request:
+      path:
+        receiptId: "${receiptId}"
+    expected:
+      statusCodes: [201]
+      contentType: "application/json"
+      requiredFields:
+        - "receipt_id"
+        - "has_errors"
+        - "errors"
+    timeoutMs: 10000
+    repeatable: false
+
+  - id: "get-analytics"
+    name: "Аналитика расходов"
+    description: "Возвращает динамику по месяцам, метрики и категории"
+    method: "GET"
+    path: "/analytics"
+    role: "public"
+    request:
+      query:
+        max_user_id: 1
+        period: "half_year"
+    expected:
+      statusCodes: [200]
+      contentType: "application/json"
+      requiredFields:
+        - "period"
+        - "points"
+        - "summary"
+    timeoutMs: 5000
+    repeatable: true
+
+  - id: "get-analytics-categories"
+    name: "Категории расходов за месяц"
+    description: "Возвращает категории расходов за конкретный месяц"
+    method: "GET"
+    path: "/analytics/categories"
+    role: "public"
+    request:
+      query:
+        max_user_id: 1
+        year: 2026
+        month: 8
+    expected:
+      statusCodes: [200]
+      contentType: "application/json"
+    timeoutMs: 5000
+    repeatable: true
+
+  - id: "ai-chat"
+    name: "AI-помощник"
+    description: "Отвечает на вопросы по квитанциям"
+    method: "POST"
+    path: "/ai/chat"
+    role: "public"
+    request:
+      headers:
+        Content-Type: "application/json"
+      body:
+        max_user_id: 1
+        message: "Какая итоговая сумма в последней квитанции?"
+    expected:
+      statusCodes: [200]
+      contentType: "application/json"
+      requiredFields:
+        - "answer"
+    timeoutMs: 30000
+    repeatable: false
+
+cleanup: []
