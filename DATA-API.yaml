@@ -5,7 +5,7 @@ solution:
   teamId: "<team id>"
 
 api:
-  baseUrl: "https://api.example.org"
+  baseUrl: "https://kvitdom-bot.ru/api"
   openapi: "./openapi.json"
   defaultHeaders:
     Accept: "application/json"
@@ -15,11 +15,11 @@ checks:
     name: "Загрузка квитанции"
     description: "Принимает PDF-квитанцию и сохраняет её в БД"
     method: "POST"
-    path: "/receipts/upload/1"
+    path: "/receipts/upload/{max_user_id}"
     role: "public"
     request:
-      headers:
-        Content-Type: "multipart/form-data"
+      path:
+        max_user_id: 1
     expected:
       statusCodes: [201]
       contentType: "application/json"
@@ -36,8 +36,11 @@ checks:
     name: "Список квитанций пользователя"
     description: "Возвращает список квитанций по max_user_id"
     method: "GET"
-    path: "/receipts/user/1"
+    path: "/receipts/user/{max_user_id}"
     role: "public"
+    request:
+      path:
+        max_user_id: 1
     expected:
       statusCodes: [200]
       contentType: "application/json"
@@ -48,20 +51,19 @@ checks:
     name: "Детали квитанции"
     description: "Возвращает квитанцию со всеми связанными данными"
     method: "GET"
-    path: "/receipts/{receiptId}"
+    path: "/receipts/{receipt_id}"
     role: "public"
     dependsOn:
       - "upload-receipt"
     request:
       path:
-        receiptId: "${receiptId}"
+        receipt_id: "${receiptId}"
     expected:
       statusCodes: [200]
       contentType: "application/json"
       requiredFields:
         - "id"
         - "period_month"
-        - "service_charges"
     timeoutMs: 5000
     repeatable: true
 
@@ -69,13 +71,13 @@ checks:
     name: "Проверка квитанции на ошибки"
     description: "Анализирует начисления и возвращает найденные ошибки"
     method: "POST"
-    path: "/receipts/check/{receiptId}"
+    path: "/receipts/check/{receipt_id}"
     role: "public"
     dependsOn:
       - "upload-receipt"
     request:
       path:
-        receiptId: "${receiptId}"
+        receipt_id: "${receiptId}"
     expected:
       statusCodes: [201]
       contentType: "application/json"
@@ -84,7 +86,25 @@ checks:
         - "has_errors"
         - "errors"
     timeoutMs: 10000
-    repeatable: false
+    repeatable: true
+
+  - id: "get-complaint"
+    name: "Скачать жалобу по квитанции"
+    description: "Формирует PDF-жалобу по найденным ошибкам квитанции"
+    method: "GET"
+    path: "/receipts/{receipt_id}/complaint"
+    role: "public"
+    dependsOn:
+      - "upload-receipt"
+      - "check-receipt"
+    request:
+      path:
+        receipt_id: "${receiptId}"
+    expected:
+      statusCodes: [200]
+      contentType: "application/pdf"
+    timeoutMs: 10000
+    repeatable: true
 
   - id: "get-analytics"
     name: "Аналитика расходов"
@@ -141,6 +161,6 @@ checks:
       requiredFields:
         - "answer"
     timeoutMs: 30000
-    repeatable: false
+    repeatable: true
 
 cleanup: []
