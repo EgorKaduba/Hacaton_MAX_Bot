@@ -17,3 +17,12 @@ app = FastAPI(
 app.include_router(receipts_router)
 app.include_router(analytics_router)
 app.include_router(ai_router)
+
+@app.get("/")
+async def root():
+    return {
+        "name": settings.PROJECT_NAME,
+        "version": settings.PROJECT_VERSION,
+        "description": "Мини-приложение MAX для помощи в работе с квитанциями ЖКХ",
+        "docs": "/api/docs"
+    }
