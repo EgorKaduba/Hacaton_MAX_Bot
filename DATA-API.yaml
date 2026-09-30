@@ -2,7 +2,7 @@ schemaVersion: "1.0"
 
 solution:
   name: "КвитДом"
-  teamId: "<team id>"
+  teamId: "426"
 
 api:
   baseUrl: "https://kvitdom-bot.ru/api"
